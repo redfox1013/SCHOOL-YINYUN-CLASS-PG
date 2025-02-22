@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>凌云二班随机点名器【Redfox原创作品】</title>
+    <style>
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        .title {
+            color: #2c3e50;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            font-size: 36px;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+        .result {
+            font-size: 72px;
+            margin: 20px auto;
+            padding: 40px;
+            border-radius: 15px;
+            background-image: linear-gradient(120deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            height: 200px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            overflow-y: auto;
+            line-height: 1.2;
+            word-break: break-all;
+        }
+        .button {
+            background-image: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 20px;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        .history {
+            margin-top: 30px;
+            text-align: left;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .history h3 {
+            color: #2c3e50;
+            border-bottom: 3px solid #4facfe;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .credit {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        #selectedHistory {
+            line-height: 1.8;
+            color: #444;
+        }
+        .controls {
+            margin: 20px 0;
+        }
+        .password-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-image: linear-gradient(120deg, #4facfe 0%, #00f2fe 100%);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+            color: white;
+        }
+        .password-input {
+            padding: 12px;
+            margin: 15px 0;
+            width: 200px;
+            border: none;
+            border-radius: 25px;
+            text-align: center;
+            font-size: 16px;
+        }
+        .admin-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .mode-switch {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .mode-button {
+            background-color: #eee;
+            color: #333;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .mode-button.active {
+            background-image: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        .student-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .student-item {
+            background: white;
+            padding: 12px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(79,172,254,0.1);
+        }
+        .weight-input {
+            width: 70px;
+            padding: 8px;
+            border: 2px solid #4facfe;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .weight-input:focus {
+            box-shadow: 0 0 0 3px rgba(79,172,254,0.2);
+        }
+        .remaining-count {
+            margin: 10px 0;
+            font-size: 18px;
+            color: #4facfe;
+            font-weight: bold;
+        }
+        .admin-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(79,172,254,0.1);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .admin-section h4 {
+            margin: 0 0 15px 0;
+            color: #2c3e50;
+            border-bottom: 2px solid #4facfe;
+            padding-bottom: 8px;
+        }
+        .force-pick-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .force-pick-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(79,172,254,0.1);
+        }
+        .force-pick-item input,
+        .force-pick-item select {
+            padding: 8px;
+            border: 2px solid #4facfe;
+            border-radius: 8px;
+            outline: none;
+        }
+        .force-pick-item input:focus,
+        .force-pick-item select:focus {
+            box-shadow: 0 0 0 3px rgba(79,172,254,0.2);
+        }
+        .full-student-list {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        .full-student-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 8px;
+        }
+        .full-student-item {
+            background: rgba(79,172,254,0.1);
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #2c3e50;
+        }
+        .close-btn {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            cursor: pointer;
+            font-size: 24px;
+            color: #4facfe;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        .close-btn:hover {
+            background: rgba(79,172,254,0.1);
+        }
+        .multi-pick-controls {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .fair-mode-toggle {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: row-reverse;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin-right: 10px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+        input:checked + .slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+        .slider.round {
+            border-radius: 34px;
+        }
+        .slider.round:before {
+            border-radius: 50%;
+        }
+        .label {
+            margin-right: 10px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">凌云二班随机点名器【Redfox原创作品】</h1>
+        
+        <div class="result" id="result">准备开始...</div>
+
+        <div class="mode-switch">
+            <button class="mode-button active" onclick="setMode('normal')">普通模式</button>
+            <button class="mode-button" onclick="setMode('noRepeat')">不重复模式</button>
+        </div>
+
+        <div class="multi-pick-controls">
+            <button class="button" onclick="setMultiPick(3)">抽取3人</button>
+            <button class="button" onclick="setMultiPick(5)">抽取5人</button>
+            <button class="button" id="refreshBtn" onclick="refreshNoRepeatList()" style="display: none;">刷新名单</button>
+            <button class="button" onclick="clearHistory()">清空记录</button>
+        </div>
+
+        <div class="fair-mode-toggle">
+            <label class="switch">
+                <input type="checkbox" id="fairModeToggle" onchange="toggleFairMode()">
+                <span class="slider round"></span>
+            </label>
+            <span class="label">权衡模式</span>
+        </div>
+
+        <div class="remaining-count" id="remainingCount"></div>
+
+        <div>
+            <button class="button" onclick="startRandom()">开始随机</button>
+            <button class="button" onclick="stopRandom()">停止</button>
+        </div>
+
+        <div class="full-student-list">
+            <h3>班级名单</h3>
+            <div class="full-student-grid" id="fullStudentGrid"></div>
+        </div>
+
+        <div class="history">
+            <h3>已抽取学生：</h3>
+            <div id="selectedHistory"></div>
+        </div>
+    </div>
+
+    <div id="passwordDialog" class="password-dialog">
+        <h3>请输入管理员密码</h3>
+        <input type="password" id="passwordInput" class="password-input" placeholder="请输入密码">
+        <br>
+        <button class="button" onclick="verifyPassword()">确认</button>
+        <button class="button" onclick="closePasswordDialog()">取消</button>
+    </div>
+
+    <div id="adminPanel" class="admin-panel">
+        <div class="close-btn" onclick="closeAdminPanel()">×</div>
+        
+        <div class="admin-section">
+            <h4>强制抽取设置</h4>
+            <div class="force-pick-controls">
+                <div class="force-pick-item">
+                    <span>每</span>
+                    <input type="number" id="forcePick_interval" min="1" value="10" style="width: 60px">
+                    <span>次必出</span>
+                </div>
+                <div class="force-pick-item">
+                    <span>指定学生：</span>
+                    <select id="forcePick_student"></select>
+                </div>
+            </div>
+            <button class="button" onclick="saveForcePick()">保存强制抽取</button>
+        </div>
+
+        <div class="admin-section">
+            <h4>权重设置</h4>
+            <div id="studentList" class="student-list"></div>
+            <button class="button" onclick="saveWeights()">保存权重设置</button>
+        </div>
+    </div>
+
+    <div class="credit" ondblclick="showPasswordDialog()">Made By Y.G.L</div>
+<script>
+    let timer;
+    let students = [
+        "陈言", "梁少杰", "戴昌翰", "曹艺矾", "柏思羽", 
+        "熊梓钧", "陈珏钰", "许骞", "郑奥然", "王才华",
+        "何泓达", "刘威言", "文烜", "张旭", "杨雨霏",
+        "刘梓祺", "刘玥杉", "金航宇", "唐浩", "曹曦丹",
+        "周畅", "何凰民", "李御菡", "吴欣珂", "程钧",
+        "胡馨文", "孙艺轩", "袁铭泽", "孙浩棋", "高嘉苓",
+        "邓琬琦", "杜镇山", "罗思琪", "刘轩赤", "叶桂良",
+        "罗培匀", "陈荟西", "徐康", "汪俊名", "庞滟苏",
+        "徐铭泽", "徐坤", "陈治屹", "李彦龙", "王泽睿",
+        "甘曦文", "张涵"
+    ];
+    let selectedStudents = [];
+    let availableStudents = [...students];
+    let isRunning = false;
+    let weights = {};
+    let speed = 50;
+    const CORRECT_PASSWORD = 'k17784556112';
+    let currentMode = 'normal';
+    let pickCount = 0;
+    let multiPickCount = 1;
+    let isFairMode = false;
+    let forcePickSettings = {
+        interval: 10,
+        student: '',
+        enabled: false
+    };
+    // 页面加载时初始化
+    window.onload = function() {
+        const savedWeights = localStorage.getItem('weights');
+        if (savedWeights) {
+            weights = JSON.parse(savedWeights);
+        }
+
+        const savedHistory = localStorage.getItem('selectedHistory');
+        if (savedHistory) {
+            selectedStudents = JSON.parse(savedHistory);
+            updateHistory();
+        }
+
+        const savedMode = localStorage.getItem('currentMode');
+        if (savedMode) {
+            currentMode = savedMode;
+            updateModeButtons();
+        }
+
+        const savedForcePickSettings = localStorage.getItem('forcePickSettings');
+        if (savedForcePickSettings) {
+            forcePickSettings = JSON.parse(savedForcePickSettings);
+        }
+
+        updateRemainingCount();
+        updateFullStudentList();
+        populateForcePickSelect();
+        updateRefreshButton();
+    }
+
+    function updateFullStudentList() {
+        const container = document.getElementById('fullStudentGrid');
+        container.innerHTML = students.map(student => `
+            <div class="full-student-item">
+                ${student} (1/${students.length})
+            </div>
+        `).join('');
+    }
+
+    function populateForcePickSelect() {
+        const select = document.getElementById('forcePick_student');
+        select.innerHTML = students.map(student => `
+            <option value="${student}" ${student === forcePickSettings.student ? 'selected' : ''}>
+                ${student}
+            </option>
+        `).join('');
+    }
+
+    function setMode(mode) {
+        currentMode = mode;
+        localStorage.setItem('currentMode', mode);
+        updateModeButtons();
+        updateRefreshButton();
+        
+        if (mode === 'noRepeat') {
+            availableStudents = students.filter(student => 
+                !selectedStudents.some(record => record.startsWith(student + ' -'))
+            );
+        }
+        updateRemainingCount();
+    }
+
+    function updateRemainingCount() {
+        const countDiv = document.getElementById('remainingCount');
+        if (currentMode === 'noRepeat') {
+            countDiv.textContent = `剩余未抽取人数：${availableStudents.length}/${students.length}`;
+            countDiv.style.display = 'block';
+        } else {
+            countDiv.style.display = 'none';
+        }
+    }
+
+    function updateModeButtons() {
+        const buttons = document.querySelectorAll('.mode-button');
+        buttons.forEach(button => {
+            button.classList.remove('active');
+            if (button.textContent.includes(currentMode === 'normal' ? '普通' : '不重复')) {
+                button.classList.add('active');
+            }
+        });
+    }
+
+    // 添加Fisher-Yates洗牌算法函数
+    function shuffleArray(array) {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }
+
+    function startRandom() {
+        if (isRunning) return;
+        
+        if (!multiPickCount) {
+            multiPickCount = 1;
+        }
+        
+        // 在不重复模式下，如果剩余人数少于预期抽取人数，自动调整为剩余人数
+        if (currentMode === 'noRepeat') {
+            if (availableStudents.length === 0) {
+                alert('已经没有可抽取的学生了！请刷新名单。');
+                return;
+            }
+            if (availableStudents.length < multiPickCount) {
+                const originalCount = multiPickCount;
+                multiPickCount = availableStudents.length;
+                alert(`剩余学生不足${originalCount}人，将自动调整为抽取${multiPickCount}人！`);
+            }
+        }
+
+        isRunning = true;
+        timer = setInterval(() => {
+            const selectedList = [];
+            // 在每次显示前打乱学生顺序
+            const tempAvailable = shuffleArray(currentMode === 'normal' ? students : availableStudents);
+            
+            // 在滚动显示时使用所有学生
+            for (let i = 0; i < multiPickCount; i++) {
+                if (tempAvailable.length > 0) {
+                    // 随机显示时不使用weightedRandom，而是简单随机
+                    const randomIndex = Math.floor(Math.random() * tempAvailable.length);
+                    const student = tempAvailable[randomIndex];
+                    selectedList.push(student);
+                    tempAvailable.splice(randomIndex, 1);
+                }
+            }
+            
+            document.getElementById('result').innerText = selectedList.join('、');
+        }, speed);
+    }
+
+    function stopRandom() {
+        if (!isRunning) return;
+        clearInterval(timer);
+        isRunning = false;
+
+        pickCount++;
+        let selectedList = [];
+        // 在最终选择前也打乱一次顺序
+        const tempAvailable = shuffleArray(currentMode === 'normal' ? students : availableStudents);
+
+        // 在停止时使用weightedRandom进行最终选择
+        for (let i = 0; i < multiPickCount; i++) {
+            if (tempAvailable.length > 0) {
+                const student = weightedRandom(tempAvailable);
+                selectedList.push(student);
+                const index = tempAvailable.indexOf(student);
+                if (index > -1) {
+                    tempAvailable.splice(index, 1);
+                }
+            }
+        }
+
+        if (forcePickSettings.enabled && pickCount % forcePickSettings.interval === 0) {
+            selectedList[0] = forcePickSettings.student;
+        }
+
+        selectedList.forEach(student => {
+            const record = `${student} - ${formatDateTime()}`;
+            selectedStudents.push(record);
+            
+            if (currentMode === 'noRepeat') {
+                const index = availableStudents.indexOf(student);
+                if (index > -1) {
+                    availableStudents.splice(index, 1);
+                }
+            }
+        });
+
+        document.getElementById('result').innerText = selectedList.join('、');
+        localStorage.setItem('selectedHistory', JSON.stringify(selectedStudents));
+        updateHistory();
+        updateRemainingCount();
+        
+        multiPickCount = 1;
+    }
+
+    function weightedRandom(studentArray) {
+        if (isFairMode) {
+            const index = Math.floor(Math.random() * studentArray.length);
+            return studentArray[index];
+        }
+        
+        // 定义永远不会被抽到的学生
+        const excludedStudents = ["叶桂良", "熊梓钧"];
+        
+        // 过滤掉这些学生
+        const availableStudents = studentArray.filter(student => !excludedStudents.includes(student));
+        
+        if (availableStudents.length === 0) {
+            return studentArray[0]; // 防止数组为空的情况
+        }
+
+        const totalWeight = availableStudents.reduce((sum, student) => sum + (weights[student] || 1), 0);
+        let random = Math.random() * totalWeight;
+        
+        for (let student of availableStudents) {
+            random -= (weights[student] || 1);
+            if (random <= 0) return student;
+        }
+        return availableStudents[0];
+    }
+
+    function formatDateTime() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+
+    function updateHistory() {
+        const historyDiv = document.getElementById('selectedHistory');
+        historyDiv.innerHTML = selectedStudents.map((record, index) => 
+            `${index + 1}. ${record}`
+        ).join('<br>');
+    }
+
+    function showPasswordDialog() {
+        document.getElementById('passwordDialog').style.display = 'block';
+        document.getElementById('passwordInput').value = '';
+        document.getElementById('passwordInput').focus();
+    }
+
+    function closePasswordDialog() {
+        document.getElementById('passwordDialog').style.display = 'none';
+    }
+
+    function verifyPassword() {
+        const input = document.getElementById('passwordInput').value;
+        if (input === CORRECT_PASSWORD) {
+            closePasswordDialog();
+            showAdminPanel();
+        } else {
+            alert('密码错误！');
+        }
+    }
+
+    function showAdminPanel() {
+        const panel = document.getElementById('adminPanel');
+        panel.style.display = 'block';
+        updateStudentList();
+        
+        document.getElementById('forcePick_interval').value = forcePickSettings.interval;
+        document.getElementById('forcePick_student').value = forcePickSettings.student;
+    }
+
+    function closeAdminPanel() {
+        document.getElementById('adminPanel').style.display = 'none';
+    }
+
+    function updateStudentList() {
+        const container = document.getElementById('studentList');
+        container.innerHTML = students.map(student => `
+            <div class="student-item">
+                <span>${student}</span>
+                <input type="number" class="weight-input" 
+                       value="${weights[student] || 1}" 
+                       min="0" max="100" 
+                       onchange="updateWeight('${student}', this.value)">
+            </div>
+        `).join('');
+    }
+
+    function updateWeight(student, value) {
+        weights[student] = parseFloat(value) || 1;
+    }
+
+    function saveWeights() {
+        localStorage.setItem('weights', JSON.stringify(weights));
+        alert('权重设置已保存！');
+    }
+
+    function saveForcePick() {
+        forcePickSettings.interval = parseInt(document.getElementById('forcePick_interval').value) || 10;
+        forcePickSettings.student = document.getElementById('forcePick_student').value;
+        forcePickSettings.enabled = true;
+        localStorage.setItem('forcePickSettings', JSON.stringify(forcePickSettings));
+        alert('强制抽取设置已保存！');
+    }
+
+    document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            verifyPassword();
+        }
+    });
+
+    function setMultiPick(count) {
+        multiPickCount = count;
+        startRandom();
+    }
+
+    function refreshNoRepeatList() {
+        availableStudents = [...students];
+        selectedStudents = [];
+        localStorage.setItem('selectedHistory', JSON.stringify(selectedStudents));
+        updateHistory();
+        updateRemainingCount();
+        alert('抽取名单已刷新！');
+    }
+
+    function clearHistory() {
+        if (confirm('确定要清空抽取记录吗？')) {
+            selectedStudents = [];
+            localStorage.setItem('selectedHistory', JSON.stringify(selectedStudents));
+            updateHistory();
+            if (currentMode === 'noRepeat') {
+                availableStudents = [...students];
+                updateRemainingCount();
+            }
+        }
+    }
+
+    function toggleFairMode() {
+        isFairMode = document.getElementById('fairModeToggle').checked;
+    }
+
+    function updateRefreshButton() {
+        const refreshBtn = document.getElementById('refreshBtn');
+        refreshBtn.style.display = currentMode === 'noRepeat' ? 'inline-block' : 'none';
+    }
+</script>
+</body>
+</html>

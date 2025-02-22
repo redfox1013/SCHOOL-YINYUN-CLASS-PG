@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>凌云二班座位选择系统(REDFOX 制作)</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>凌云二班座位选择系统(REDFOX 制作)</h1>
+        
+        <div class="controls">
+            <div class="file-controls">
+                <input type="file" id="nameList" accept=".txt" />
+                <button onclick="loadNames()">导入名单</button>
+            </div>
+            <div class="current-student">
+                当前选择: <span id="currentStudent">无</span>
+            </div>
+            <div class="student-quick-select">
+                <input type="text" id="studentSearch" placeholder="搜索学生..." oninput="searchStudent()">
+                <div id="studentList" class="student-list"></div>
+            </div>
+            <div class="action-controls">
+                <button onclick="undoLastSelection()" class="undo-btn">撤销上一步</button>
+                <button onclick="exportSeatingChart()" class="export-btn">导出座位表</button>
+            </div>
+        </div>
+
+        <div class="classroom" id="classroom">
+            <div class="front">
+                <div class="charging">充电口</div>
+                <div class="stage">讲台</div>
+                <div class="door-front">前门</div>
+            </div>
+            
+            <div class="seating-area">
+                <div class="left-wall">阳台</div>
+                
+                <div class="seats">
+                    <div class="aisle-label aisle-label-1">前走廊</div>
+                    <div class="row">
+                        <div class="seat" data-seat="1"></div>
+                        <div class="seat" data-seat="2"></div>
+                        <div class="aisle"></div>
+                        <div class="seat" data-seat="13"></div>
+                        <div class="seat" data-seat="14"></div>
+                        <div class="aisle"></div>
+                        <div class="seat" data-seat="25"></div>
+                        <div class="seat" data-seat="26"></div>
+                        <div class="aisle"></div>
+                        <div class="seat" data-seat="36"></div>
+                        <div class="seat" data-seat="38"></div>
+                    </div>
+                    <div class="row">
+                        <div class="seat" data-seat="3"></div>
+                        <div class="seat" data-seat="4"></div>
+                        <div class="aisle"></div>
+                        <div class="seat" data-seat="15"></div>
+                        <div class="seat" data-seat="16"></div>
+                        <div class="aisle"></div>
+                        <div class="seat" data-seat="27"></div>
+                        <div class="seat" data-seat="28"></div>
+                        <div class="aisle"></div>
+                        <div class="seat" data-seat="39"></div>
+                        <div class="seat" data-seat="40"></div>
+                    </div>
+                    <div class="aisle-label aisle-label-2">中走廊</div>
+                    <div class="row">
+                        <div class="seat" data-seat="5"></div>
+                        <div class="seat" data-seat="6"></div>
+                        <div class="aisle"></div>
+                        <div class="seat" data-seat="17"></div>
+                        <div class="seat" data-seat="18"></div>
+                        <div class="aisle"></div>
+                        <div class="seat" data-seat="29"></div>
+                        <div class="seat" data-seat="30"></div>
+                        <div class="aisle"></div>
+                        <div class="seat" data-seat="41"></div>
+                        <div class="seat" data-seat="42"></div>
+                    </div>
+                    <div class="row">
+                        <div class="seat" data-seat="7"></div>
+                        <div class="seat" data-seat="8"></div>
+                        <div class="aisle"></div>
+                        <div class="seat" data-seat="19"></div>
+                        <div class="seat" data-seat="20"></div>
+                        <div class="aisle"></div>
+                        <div class="seat" data-seat="31"></div>
+                        <div class="seat" data-seat="32"></div>
+                        <div class="aisle"></div>
+                        <div class="seat" data-seat="43"></div>
+                        <div class="seat" data-seat="44"></div>
+                    </div>
+                    <div class="aisle-label aisle-label-3">后走廊</div>
+                    <div class="row">
+                        <div class="seat" data-seat="9"></div>
+                        <div class="seat" data-seat="10"></div>
+                        <div class="aisle"></div>
+                        <div class="seat" data-seat="21"></div>
+                        <div class="seat" data-seat="22"></div>
+                        <div class="aisle"></div>
+                        <div class="seat" data-seat="33"></div>
+                        <div class="seat" data-seat="34"></div>
+                        <div class="aisle"></div>
+                        <div class="seat" data-seat="45"></div>
+                        <div class="seat" data-seat="46"></div>
+                    </div>
+                    <div class="row">
+                        <div class="seat" data-seat="11"></div>
+                        <div class="seat" data-seat="12"></div>
+                        <div class="aisle"></div>
+                        <div class="seat" data-seat="23"></div>
+                        <div class="seat" data-seat="24"></div>
+                        <div class="aisle"></div>
+                        <div class="seat" data-seat="35"></div>
+                        <div class="seat" data-seat="36"></div>
+                        <div class="aisle"></div>
+                        <div class="seat" data-seat="47"></div>
+                        <div class="seat" data-seat="48"></div>
+                    </div>
+                </div>
+                
+                <div class="right-wall">墙壁</div>
+            </div>
+            
+            <div class="back">
+                <div class="door-back">后门</div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html> 
