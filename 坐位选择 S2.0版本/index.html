@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>凌云二班座位选择系统(REDFOX 制作)</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>凌云二班座位选择系统(REDFOX 制作)</h1>
+        
+        <div class="controls">
+            <div class="file-controls">
+                <input type="file" id="nameList" accept=".txt" />
+                <button onclick="loadNames()">导入名单</button>
+            </div>
+            <div class="mode-selection">
+                <button onclick="switchMode('manual')" class="mode-btn active" id="manualMode">手动选择</button>
+                <button onclick="switchMode('random')" class="mode-btn" id="randomMode">随机分配</button>
+                <button onclick="switchMode('hybrid')" class="mode-btn" id="hybridMode">混合模式</button>
+            </div>
+            <div class="current-student">
+                当前选择: <span id="currentStudent">无</span>
+            </div>
+            <div class="action-controls">
+                <!-- 手动模式按钮 -->
+                <div id="manualControls" class="mode-controls">
+                    <button onclick="undoLastSelection()" class="undo-btn">撤销上一步</button>
+                </div>
+                <!-- 随机模式按钮 -->
+                <div id="randomControls" class="mode-controls" style="display: none;">
+                    <button onclick="randomizeAllSeats()" id="randomizeAll" class="random-btn">开始随机</button>
+                </div>
+                <!-- 混合模式按钮 -->
+                <div id="hybridControls" class="mode-controls" style="display: none;">
+                    <button onclick="hybridSelection()" id="hybridSelection" class="hybrid-btn">开始混合</button>
+                    <button onclick="reRandomizeHybrid()" id="reRandomizeHybrid" class="hybrid-btn">重新随机</button>
+                </div>
+                <!-- 通用按钮 -->
+                <button onclick="stopAnimation()" id="stopAnimation" class="stop-btn" style="display: none;">停止</button>
+                <button onclick="exportSeatingChart()" class="export-btn">导出座位表</button>
+            </div>
+        </div>
+
+        <div class="classroom" id="classroom">
+            <div class="front">
+                <div class="charging">充电口</div>
+                <div class="stage">讲台</div>
+                <div class="door-front">前门</div>
+            </div>
+            
+            <div class="seating-area">
+                <div class="left-wall">阳台</div>
+                
+                <div class="seats">
+                    <div class="group-container">
+                        <div class="row">
+                            <div class="seat-group">
+                                <div class="seat" data-seat="1">1</div>
+                                <div class="seat" data-seat="2">2</div>
+                                <div class="seat" data-seat="3">3</div>
+                                <div class="seat" data-seat="4">4</div>
+                                <div class="seat" data-seat="5">5</div>
+                                <div class="seat" data-seat="6">6</div>
+                            </div>
+                            <div class="aisle-container">
+                                <div class="aisle"></div>
+                            </div>
+                            <div class="seat-group">
+                                <div class="seat" data-seat="13">13</div>
+                                <div class="seat" data-seat="14">14</div>
+                                <div class="seat" data-seat="15">15</div>
+                                <div class="seat" data-seat="16">16</div>
+                                <div class="seat" data-seat="17">17</div>
+                                <div class="seat" data-seat="18">18</div>
+                            </div>
+                            <div class="aisle-container">
+                                <div class="aisle"></div>
+                            </div>
+                            <div class="seat-group">
+                                <div class="seat" data-seat="25">25</div>
+                                <div class="seat" data-seat="26">26</div>
+                                <div class="seat" data-seat="27">27</div>
+                                <div class="seat" data-seat="28">28</div>
+                                <div class="seat" data-seat="29">29</div>
+                                <div class="seat" data-seat="30">30</div>
+                            </div>
+                            <div class="aisle-container">
+                                <div class="aisle"></div>
+                            </div>
+                            <div class="seat-group">
+                                <div class="seat" data-seat="36">36</div>
+                                <div class="seat" data-seat="38">38</div>
+                                <div class="seat" data-seat="39">39</div>
+                                <div class="seat" data-seat="40">40</div>
+                                <div class="seat" data-seat="41">41</div>
+                                <div class="seat" data-seat="42">42</div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="seat-group">
+                                <div class="seat" data-seat="7">7</div>
+                                <div class="seat" data-seat="8">8</div>
+                                <div class="seat" data-seat="9">9</div>
+                                <div class="seat" data-seat="10">10</div>
+                                <div class="seat" data-seat="11">11</div>
+                                <div class="seat" data-seat="12">12</div>
+                            </div>
+                            <div class="aisle-container">
+                                <div class="aisle"></div>
+                            </div>
+                            <div class="seat-group">
+                                <div class="seat" data-seat="19">19</div>
+                                <div class="seat" data-seat="20">20</div>
+                                <div class="seat" data-seat="21">21</div>
+                                <div class="seat" data-seat="22">22</div>
+                                <div class="seat" data-seat="23">23</div>
+                                <div class="seat" data-seat="24">24</div>
+                            </div>
+                            <div class="aisle-container">
+                                <div class="aisle"></div>
+                            </div>
+                            <div class="seat-group">
+                                <div class="seat" data-seat="31">31</div>
+                                <div class="seat" data-seat="32">32</div>
+                                <div class="seat" data-seat="33">33</div>
+                                <div class="seat" data-seat="34">34</div>
+                                <div class="seat" data-seat="35">35</div>
+                                <div class="seat" data-seat="36">36</div>
+                            </div>
+                            <div class="aisle-container">
+                                <div class="aisle"></div>
+                            </div>
+                            <div class="seat-group">
+                                <div class="seat" data-seat="43">43</div>
+                                <div class="seat" data-seat="44">44</div>
+                                <div class="seat" data-seat="45">45</div>
+                                <div class="seat" data-seat="46">46</div>
+                                <div class="seat" data-seat="47">47</div>
+                                <div class="seat" data-seat="48">48</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="right-wall">墙壁</div>
+            </div>
+
+            <div class="back">
+                <div class="air-con">空调</div>
+                <div class="door-back">后门</div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html> 
